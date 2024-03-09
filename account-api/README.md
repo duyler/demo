@@ -1,6 +1,6 @@
-# API обработки событий аккаунтов
+# Account events API
 
-### Установка и запуск
+### Build and run
 
 ```shell
 curl -L -O https://github.com/milinsky/account-event-api/archive/refs/heads/main.zip
@@ -18,7 +18,7 @@ make build
 make up
 ```
 
-### Работа с Api
+### Api usage
 
 ```POST http://localhost/api/account-event```
 ```
@@ -29,4 +29,4 @@ make up
 
 ```
 
-Панель RabbitMQ http://localhost:15672
+RabbitMQ dashboard http://localhost:15672
