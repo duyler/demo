@@ -1,0 +1,30 @@
+services:
+
+  php:
+    build:
+      context: ./
+      dockerfile: ./docker/php/Dockerfile
+    ports:
+      - 8080:80
+    volumes:
+      - .:/var/www
+      - ./docker/config/php:/usr/local/etc/php
+    restart: always
+
+  database:
+    hostname: db_host_common
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_DB=db_common
+      - POSTGRES_USER=db_user_common
+      - POSTGRES_PASSWORD=db_pass_common
+    ports:
+      - "5433:5432"
+    networks:
+      default:
+      postgres-db-net:
+
+networks:
+  postgres-db-net:
+  default:

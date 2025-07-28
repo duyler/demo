@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Market - Cart</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 2em; }
+        .cart-container { max-width: 700px; margin: auto; }
+        .cart-header { font-size: 2em; margin-bottom: 1em; }
+        .cart-products { border-collapse: collapse; width: 100%; margin-bottom: 2em; }
+        .cart-products th, .cart-products td { border: 1px solid #ddd; padding: 8px; }
+        .cart-products th { background: #f4f4f4; }
+        .summary { margin-top: 1em; font-size: 1.1em; }
+        .user-info, .discount-info { margin-bottom: 1em; }
+    </style>
+</head>
+<body>
+<div class="cart-container">
+    <div class="cart-header">Cart</div>
+    <div class="user-info" id="user-info"></div>
+    <div class="discount-info" id="discount-info"></div>
+    <table class="cart-products" id="cart-products">
+        <thead>
+        <tr>
+            <th>Image</th>
+            <th>Title</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Total</th>
+        </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+    <div class="summary" id="cart-summary"></div>
+</div>
+<script>
+
+    function renderCart(cart) {
+
+        // Products
+        const tbody = document.querySelector('#cart-products tbody');
+        tbody.innerHTML = '';
+        cart.products.forEach(product => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td><img src="${product.image}" alt="${product.title}" style="max-width:60px;"></td>
+                <td>${product.title}</td>
+                <td>${product.quantity}</td>
+                <td>${product.price.amount / 100}</td>
+                <td>${(product.price.amount * product.quantity) / 100}</td>
+            `;
+            tbody.appendChild(row);
+        });
+
+        // Summary
+        document.getElementById('cart-summary').innerHTML =
+            `<b>Discount:</b> ${cart.discount.percentage}%<br>` +
+            `<b>Total:</b> ${cart.total.amount / 100} ${cart.totalWithDiscount.currency}<br>` +
+            `<b>Total with discount:</b> ${cart.totalWithDiscount.amount / 100} ${cart.totalWithDiscount.currency}`;
+    }
+
+    async function getAuth() {
+        const response = await fetch(`/api/auth`);
+        if (!response.ok) throw new Error('Ошибка получения ID пользователя!');
+        return response.json();
+    }
+
+    async function fetchCart() {
+        const auth = await getAuth();
+        if (!auth) {
+            alert('Не удалось получить ID пользователя!');
+            return;
+        }
+        try {
+            const response = await fetch(`/api/carts/${encodeURIComponent(auth.userId)}`);
+            if (!response.ok) throw new Error('Ошибка загрузки корзины');
+            const cart = await response.json();
+            renderCart(cart);
+        } catch (e) {
+            document.querySelector('.cart-container').innerHTML = `<div style="color:red;">Ошибка: ${e.message}</div>`;
+        }
+    }
+
+    fetchCart();
+</script>
+</body>
+</html> 
