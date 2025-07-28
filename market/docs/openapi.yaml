@@ -1,0 +1,142 @@
+openapi: 3.0.0
+info:
+  title: Cart API
+  description: API for managing the shopping cart
+  version: 1.0.0
+servers:
+  - url: https://api.example.com
+    description: Production server
+  - url: http://localhost:8080
+    description: Development server
+tags:
+  - name: Cart
+    description: Operations with a cart
+  - name: Auth
+    description: Operations with a auth
+paths:
+  /api/auth:
+    get:
+      tags: [ Auth ]
+      summary: Get auth data
+      responses:
+        '200':
+          description: Information about auth
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthData'
+        '404':
+          description: Auth data not found
+  /api/carts/{cartId}:
+    get:
+      tags: [Cart]
+      summary: Get information about the cart
+      parameters:
+        - name: cartId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Information about the cart
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CartResponse'
+        '404':
+          description: Cart not found
+
+components:
+
+  schemas:
+    AuthData:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+          example: "0196ec04-9e4e-714f-b36f-8efed52183d7"
+      required:
+        - userId
+
+    CartResponse:
+      type: object
+      properties:
+        total:
+          $ref: '#/components/schemas/Money'
+        totalWithDiscount:
+          $ref: '#/components/schemas/Money'
+        totalDiscount:
+          $ref: '#/components/schemas/Money'
+        totalQuantity:
+          type: integer
+          example: 67
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+        discount:
+          $ref: '#/components/schemas/Discount'
+      required:
+        - total
+        - totalWithDiscount
+        - totalDiscount
+        - totalQuantity
+        - products
+        - discount
+
+    Money:
+      type: object
+      properties:
+        amount:
+          type: string
+          format: decimal
+          example: "32879"
+        currency:
+          type: string
+          example: "EUR"
+      required:
+        - amount
+        - currency
+
+    Product:
+      type: object
+      properties:
+        productId:
+          type: string
+          format: uuid
+          example: "019714e9-8224-702e-84ac-2c2c63fb1e29"
+        cartId:
+          type: string
+          format: uuid
+          example: "019714e9-8224-702e-84ac-2c2c62b7e63e"
+        image:
+          type: string
+          example: "/img/product.png"
+        title:
+          type: string
+          example: "Kirlin-Franecki"
+        quantity:
+          type: integer
+          example: 8
+        price:
+          $ref: '#/components/schemas/Money'
+      required:
+        - productId
+        - cartId
+        - image
+        - title
+        - quantity
+        - price
+
+    Discount:
+      type: object
+      properties:
+        percentage:
+          type: number
+          format: integer
+          example: 3
+      required:
+        - percentage

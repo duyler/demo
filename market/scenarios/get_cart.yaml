@@ -1,0 +1,28 @@
+id: GetCart
+description: 'Get cart data by id'
+reason:
+  route:
+    method: !php/enum Duyler\Web\Enum\HttpMethod::Get
+    path: '/carts/{$cartId}'
+    where:
+      cartId: !php/enum Duyler\Router\Enum\Type::String
+scenario:
+  start:
+    - !php/enum Market\Domain\Action\Cart::GetCartId
+  success:
+    next:
+      - !php/enum Market\Domain\Action\Sales::GetUserDiscount
+      - !php/enum Market\Domain\Action\Cart::GetCartItems
+    success:
+      next:
+        - !php/enum Market\Domain\Action\Product::GetCartItemsProducts
+      success:
+        next:
+          - !php/enum Market\Domain\Action\Cart::GetCartProducts
+        success:
+          next:
+            - !php/enum Market\Domain\Action\Cart::GetCart
+          success:
+            end:
+              - !php/enum Market\Domain\Action\Cart::SendCartResponse
+
